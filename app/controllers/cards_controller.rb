@@ -3,6 +3,15 @@ class CardsController < ApplicationController
     # GET /card
     # GET /card.json
     def index
+
+      # Create default cards & tasks if empty for this authorization
+      if Card.count == 0 then
+        ActiveRecord::Base.transaction do
+          tasks = Task.create([{name:"ContactList Example", done:true},{name:"Kanban Example", done:false},{name:"My own experiments", done:false}])
+          cards = Card.create([{title: "Read the Book", description: "I should read the **whole** book", color: '#BD8D31', status: "in-progress"}, {title: "Write some code", description: "Code along with the samples in the book at [github](https://github.com/pro-react)",color: '#3A7E28',status: "todo",tasks: tasks}])
+        end
+      end
+
       @cards = Card.order("position")
     end
 
