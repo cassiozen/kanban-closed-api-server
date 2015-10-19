@@ -18,7 +18,7 @@ class ApplicationController < ActionController::Base
     Authorization.current_id = current_authorization.id
     yield
   ensure
-    Authorization.current_id = nil
+    Authorization.current_id = 1
   end
 
 end
