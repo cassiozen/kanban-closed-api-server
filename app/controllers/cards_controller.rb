@@ -1,9 +1,11 @@
 class CardsController < ApplicationController
     before_action :set_card, only: [:show, :edit, :update, :sort, :destroy]
+    wrap_parameters :card, include: [:title, :description, :color, :status, :row_order_position]
     # GET /card
     # GET /card.json
     def index
-      @cards = Card.where(authorization_id: Authorization.current_id).includes(:tasks).order("position")
+      @cards = Card.rank(:row_order).where(authorization_id: Authorization.current_id).includes(:tasks)
+
       # Create default cards & tasks if empty for this authorization
       if @cards.count == 0 then
         ActiveRecord::Base.transaction do
@@ -48,11 +50,9 @@ class CardsController < ApplicationController
     # PATCH/PUT /card/1.json
     def update
       respond_to do |format|
-        if(card_params.has_key?('position') )
-          @card.insert_at(card_params['position'])
-        end
-
-        if @card.update(card_params.except('position'))
+        puts "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
+        puts card_params
+        if @card.update(card_params)
           format.html { redirect_to @card, notice: 'Card was successfully updated.' }
           format.json { render :show, status: :ok, location: @card }
         else
@@ -90,7 +90,7 @@ class CardsController < ApplicationController
 
       # Never trust parameters from the scary internet, only allow the white list through.
       def card_params
-        params.require(:card).permit(:title, :description, :color, :status, :position)
+        params.require(:card).permit(:title, :description, :color, :status, :row_order_position)
       end
 
 end

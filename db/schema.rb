@@ -29,7 +29,7 @@ ActiveRecord::Schema.define(version: 20151019161110) do
     t.string   "status"
     t.datetime "created_at",       null: false
     t.datetime "updated_at",       null: false
-    t.integer  "position"
+    t.integer  "row_order"
     t.integer  "authorization_id"
   end
 
