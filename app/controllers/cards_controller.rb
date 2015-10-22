@@ -4,16 +4,13 @@ class CardsController < ApplicationController
     # GET /card
     # GET /card.json
     def index
-      @cards = Card.rank(:row_order).where(authorization_id: Authorization.current_id).includes(:tasks)
-
-      # Create default cards & tasks if empty for this authorization
-      if @cards.count == 0 then
-        ActiveRecord::Base.transaction do
-          tasks = Task.create([{name:"ContactList Example", done:true, authorization_id: Authorization.current_id},{name:"Kanban Example", done:false, authorization_id: Authorization.current_id},{name:"My own experiments", done:false, authorization_id: Authorization.current_id}])
-          cards = Card.create([{title: "Read the Book", description: "I should read the **whole** book", color: '#BD8D31', status: "in-progress",authorization_id: Authorization.current_id}, {title: "Write some code", description: "Code along with the samples in the book at [github](https://github.com/pro-react)",color: '#3A7E28',status: "todo",tasks: tasks,authorization_id: Authorization.current_id}])
-        end
+      if Card.where(authorization_id: Authorization.current_id).count == 0 then
+        # Create default cards & tasks if empty for this authorization
+        tasks = Task.create([{name:"ContactList Example", done:true, authorization_id: Authorization.current_id},{name:"Kanban Example", done:false, authorization_id: Authorization.current_id},{name:"My own experiments", done:false, authorization_id: Authorization.current_id}])
+        cards = Card.create([{title: "Read the Book", description: "I should read the **whole** book", color: '#BD8D31', status: "in-progress",authorization_id: Authorization.current_id}, {title: "Write some code", description: "Code along with the samples in the book at [github](https://github.com/pro-react)",color: '#3A7E28',status: "todo",tasks: tasks,authorization_id: Authorization.current_id}])
       end
 
+      @cards = Card.rank(:row_order).where(authorization_id: Authorization.current_id).includes(:tasks)
     end
 
     # GET /card/1
