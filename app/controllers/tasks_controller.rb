@@ -4,7 +4,7 @@ class TasksController < ApplicationController
     # GET /task.json
     def index
 
-      @tasks = Card.find(params[:card_id]).tasks
+      @tasks = Card.where(authorization_id: Authorization.current_id).find(params[:card_id]).tasks
     end
 
     # GET /task/1
@@ -25,7 +25,7 @@ class TasksController < ApplicationController
     # POST /task.json
     def create
       @task = Task.new(task_params)
-
+      @task[:authorization_id] = Authorization.current_id
       respond_to do |format|
         if @task.save
           format.html { redirect_to @task, notice: 'Task was successfully created.' }
@@ -80,7 +80,7 @@ class TasksController < ApplicationController
     private
       # Use callbacks to share common setup or constraints between actions.
       def set_task
-        @task = Task.find(params[:id])
+        @task = Task.where(authorization_id: Authorization.current_id).find(params[:id])
       end
 
       # Never trust parameters from the scary internet, only allow the white list through.

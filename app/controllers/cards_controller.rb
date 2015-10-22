@@ -3,16 +3,15 @@ class CardsController < ApplicationController
     # GET /card
     # GET /card.json
     def index
-
+      @cards = Card.where(authorization_id: Authorization.current_id).includes(:tasks).order("position")
       # Create default cards & tasks if empty for this authorization
-      if Card.count == 0 then
+      if @cards.count == 0 then
         ActiveRecord::Base.transaction do
-          tasks = Task.create([{name:"ContactList Example", done:true},{name:"Kanban Example", done:false},{name:"My own experiments", done:false}])
-          cards = Card.create([{title: "Read the Book", description: "I should read the **whole** book", color: '#BD8D31', status: "in-progress"}, {title: "Write some code", description: "Code along with the samples in the book at [github](https://github.com/pro-react)",color: '#3A7E28',status: "todo",tasks: tasks}])
+          tasks = Task.create([{name:"ContactList Example", done:true, authorization_id: Authorization.current_id},{name:"Kanban Example", done:false, authorization_id: Authorization.current_id},{name:"My own experiments", done:false, authorization_id: Authorization.current_id}])
+          cards = Card.create([{title: "Read the Book", description: "I should read the **whole** book", color: '#BD8D31', status: "in-progress",authorization_id: Authorization.current_id}, {title: "Write some code", description: "Code along with the samples in the book at [github](https://github.com/pro-react)",color: '#3A7E28',status: "todo",tasks: tasks,authorization_id: Authorization.current_id}])
         end
       end
 
-      @cards = Card.order("position")
     end
 
     # GET /card/1
@@ -33,7 +32,7 @@ class CardsController < ApplicationController
     # POST /card.json
     def create
       @card = Card.new(card_params)
-
+      @card[:authorization_id] = Authorization.current_id
       respond_to do |format|
         if @card.save
           format.html { redirect_to @card, notice: 'Card was successfully created.' }
@@ -86,7 +85,7 @@ class CardsController < ApplicationController
     private
       # Use callbacks to share common setup or constraints between actions.
       def set_card
-        @card = Card.find(params[:id])
+        @card = Card.where(authorization_id: Authorization.current_id).find(params[:id])
       end
 
       # Never trust parameters from the scary internet, only allow the white list through.
